@@ -96,15 +96,18 @@ export class KanbanComponent {
 
   }
 
-  removeItem(index:number, code : number){
-    if(code == 0) this.todo.splice(index,1)
-    if(code == 1) this.inProgress.splice(index,1)
-    if(code == 2) this.done.splice(index,1)
+  removeItem(id:string | undefined){
+   if(id) this.apiService.deleteTodo(id).subscribe({
+    next : (d:any)=>{
+      this.ngOnInit()
+    }
+   })
   }
 
 }
 
 interface Todo {
+  _id?:string;
   name:string;
   description : string;
   status : string

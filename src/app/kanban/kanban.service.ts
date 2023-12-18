@@ -17,5 +17,9 @@ export class KanbanService {
   postUserData(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}`, data);
   }
+
+  deleteTodo(id:string){
+    return this.http.delete(`${this.apiUrl}/${id}`)
+  }
   
 }
