@@ -2,62 +2,66 @@
 
 <button mat-raised-button color="primary" style="margin:20px" (click)="addTodo=true">Create todo</button>
 
-<div class="addtodo" *ngIf="addTodo" style="padding: 12px; border:1px solid black; margin: 10px; display: flex; width: max-content;">
-    <mat-form-field style = 'margin: 10px;'>
-        <mat-label>Name</mat-label>
-        <input type="text" matInput [(ngModel)]="currenttodo.name">
-    </mat-form-field>
-    <mat-form-field style = 'margin: 10px;'>
-        <mat-label>Description</mat-label>
-        <input type="text" matInput [(ngModel)]="currenttodo.description">
-    </mat-form-field>
-    <button mat-raised-button color="primary" style="margin:20px" (click)="this.postData()">Add</button>
-    <button mat-raised-button color="warn" style="margin:20px" (click)="addTodo=false">Cancel</button>
+<div class="addtodo" *ngIf="addTodo"
+  style="padding: 12px; border:1px solid black; margin: 10px; display: flex; width: max-content;">
+  <mat-form-field style='margin: 10px;'>
+    <mat-label>Name</mat-label>
+    <input type="text" matInput [(ngModel)]="currenttodo.name">
+  </mat-form-field>
+  <mat-form-field style='margin: 10px;'>
+    <mat-label>Description</mat-label>
+    <input type="text" matInput [(ngModel)]="currenttodo.description">
+  </mat-form-field>
+  <button mat-raised-button color="primary" style="margin:20px" (click)="this.updationFlag?this.updateData():this.postData()"> {{updationFlag==true?'Update':'Add'}} </button>
+  <button mat-raised-button color="warn" style="margin:20px" (click)="addTodo=false">Cancel</button>
 
 </div>
 <div class="kanban-container">
-  <div cdkDropList
-       class="kanban-list"
-       #todoList="cdkDropList"
-       [cdkDropListData]="todo"
-       (cdkDropListDropped)="onDrop($event)"
-       cdkDropList
-       id="0"
-       [cdkDropListConnectedTo]="[doneList, progressList]"
-       
-       >
+  <div cdkDropList class="kanban-list" #todoList="cdkDropList" [cdkDropListData]="todos"
+    (cdkDropListDropped)="onDrop($event)" cdkDropList id="0" [cdkDropListConnectedTo]="[doneList, progressList]">
     <h2>Todo</h2>
-    <div *ngFor="let task of todo; let i = index" cdkDrag class = 'item' > 
-        <strong>{{ task.name }}</strong> : {{task.description}}  
-        <mat-icon (click)="removeItem(task._id)" style="float: right; align-self: center;" color="warn">cancel</mat-icon>
+    <div *ngFor="let task of todos; let i = index" cdkDrag>
+      <div *ngIf="task.status=='0'"  class='item'>
+        <strong>{{ task.name }}</strong> : {{task.description}}
+        
+          
+        <mat-icon (click)="removeItem(task._id)" style="float: right; align-self: center;"
+          color="warn">cancel</mat-icon>
+          <mat-icon (click)="editTask(task)" style="float: right; align-self: center; margin: auto 12px;"
+          color="primary">edit</mat-icon>
+      </div>
     </div>
   </div>
 
-  <div cdkDropList
-       class="kanban-list"
-       #progressList="cdkDropList"
-       [cdkDropListData]="inProgress"
-       (cdkDropListDropped)="onDrop($event)"
-       id="1"
-       [cdkDropListConnectedTo]="[doneList, todoList]"
-       >
+  <div cdkDropList class="kanban-list" #progressList="cdkDropList" [cdkDropListData]="todos"
+    (cdkDropListDropped)="onDrop($event)" id="1" [cdkDropListConnectedTo]="[doneList, todoList]">
     <h2>In Progress</h2>
-    <div *ngFor="let task of inProgress; let i = index" cdkDrag class = 'item'> <strong>{{ task.name }}</strong> : {{task.description}}          
-      <mat-icon (click)="removeItem(task._id)" style="float: right; align-self: center;" color="warn">cancel</mat-icon>
+    <div *ngFor="let task of todos; let i = index" cdkDrag>
+      <div *ngIf="task.status=='1'"  class='item'>
+        <strong>{{ task.name }}</strong> : {{task.description}}
+       
+          <mat-icon (click)="removeItem(task._id)" style="float: right; align-self: center;"
+          color="warn">cancel</mat-icon>
+          <mat-icon (click)="editTask(task)" style="float: right; align-self: center; margin: auto 12px;"
+          color="primary">edit</mat-icon>
+
+      </div>
     </div>
   </div>
 
-  <div cdkDropList
-       class="kanban-list"
-       [cdkDropListData]="done"
-       #doneList="cdkDropList"
-       id="2"
-       (cdkDropListDropped)="onDrop($event)"
-       [cdkDropListConnectedTo]="[todoList, progressList]"
-       >
+  <div cdkDropList class="kanban-list" [cdkDropListData]="todos" #doneList="cdkDropList" id="2"
+    (cdkDropListDropped)="onDrop($event)" [cdkDropListConnectedTo]="[todoList, progressList]">
     <h2>Done</h2>
-    <div *ngFor="let task of done; let i = index" cdkDrag class = 'item'> <strong>{{ task.name }}</strong> : {{task.description}}         
-      <mat-icon (click)="removeItem(task._id)" style="float: right; align-self: center;" color="warn">cancel</mat-icon>
+    <div *ngFor="let task of todos; let i = index" cdkDrag>
+      <div *ngIf="task.status=='2'"  class='item'>
+        <strong>{{ task.name }}</strong> : {{task.description}}
+         
+        <mat-icon (click)="removeItem(task._id)" style="float: right; align-self: center;"
+          color="warn">cancel</mat-icon>
+          <mat-icon (click)="editTask(task)" style="float: right; align-self: center; margin: auto 12px;"
+          color="primary">edit</mat-icon>
+        
+      </div>
     </div>
   </div>
 </div>

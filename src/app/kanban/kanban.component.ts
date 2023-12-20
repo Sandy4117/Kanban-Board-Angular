@@ -24,12 +24,13 @@ import { KanbanService } from './kanban.service';
 export class KanbanComponent {
 
   addTodo : boolean = false;
+  updationFlag:boolean = false;
+  updationId : string | undefined;
 
   currenttodo : Todo = {name:'', description : '', status:'0'};
 
-  todo:Todo[] = [];
-  inProgress:Todo[] = [];
-  done:Todo[] = [];
+  todos:Todo[] = [];
+  
 
   constructor(private apiService: KanbanService) {}
 
@@ -40,13 +41,12 @@ export class KanbanComponent {
   }
 
   getData() {
-    const data = {}; // Replace with your data
-    this.apiService.getUser(data).subscribe(
+    this.apiService.getUser().subscribe(
       (response) => {
         console.log('Response:', response);
         // Handle the response as needed
-        this.todo = [...response]
-        console.log(this.todo);
+        this.todos = [...response]
+        console.log(this.todos);
         
       },
       (error) => {
@@ -58,13 +58,32 @@ export class KanbanComponent {
 
   postData() {
     const data =  this.currenttodo; // Replace with your data
+    
     this.apiService.postUserData(data).subscribe(
       (response) => {
         console.log('Response:', response);
-        this.ngOnInit();
+        this.todos.push(response)
         this.addTodo = false;
         this.currenttodo = {name:'', description : '', status:'0'};
-        // Handle the response as needed
+      },
+      (error) => {
+        console.error('Error:', error);
+        // Handle the error as needed
+      }
+    );
+  }
+
+
+  updateData(){
+    
+    this.apiService.updateTodo(this.currenttodo).subscribe(
+      (response) => {
+        console.log('Response:', response);
+        this.ngOnInit()
+        this.addTodo = false;
+        this.updationFlag = false;
+        this.updationId = undefined;
+        this.currenttodo = {name:'', description : '', status:'0'};
       },
       (error) => {
         console.error('Error:', error);
@@ -74,27 +93,22 @@ export class KanbanComponent {
   }
 
   onDrop(event: CdkDragDrop<Todo[]>) {
-    console.log(event)
     if (event.previousContainer === event.container) {
       // Move within the same list
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     } else {
-      // Move to a different list
-      transferArrayItem(event.previousContainer.data,
-                        event.container.data,
-                        event.previousIndex,
-                        event.currentIndex);
-
+      this.todos[event.previousIndex].status = event.container.id
+      
+      this.apiService.updateTodo(this.todos[event.previousIndex]).subscribe({
+        next : (data:any)=>{
+          console.log(data)
+        }
+      })
+     
 
     }
   }
 
-  addTodoItem(){
-    this.todo.push(this.currenttodo)
-    this.addTodo = false
-    this.currenttodo  = {name:'', description : '', status:'0'};
-
-  }
 
   removeItem(id:string | undefined){
    if(id) this.apiService.deleteTodo(id).subscribe({
@@ -104,9 +118,17 @@ export class KanbanComponent {
    })
   }
 
+  editTask(task : Todo){
+    
+    this.currenttodo = task;
+    this.addTodo = true;
+    this.updationId = task._id;
+    this.updationFlag = true;
+
+  }
 }
 
-interface Todo {
+export interface Todo {
   _id?:string;
   name:string;
   description : string;

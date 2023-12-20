@@ -1,16 +1,17 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { Todo } from './kanban.component';
 
 @Injectable({
   providedIn: 'root'
 })
 export class KanbanService {
-  private apiUrl = 'https://crudcrud.com/api/45886b75cef14ea0bdb423e76d2a8d15/board';
+  private apiUrl = 'https://crudcrud.com/api/70cc2dc72101410aba701580bfd91adc/todo';
 
   constructor(private http: HttpClient) {}
 
-  getUser(data: any): Observable<any> {
+  getUser(): Observable<any> {
     return this.http.get(`${this.apiUrl}`);
   }
   
@@ -20,6 +21,13 @@ export class KanbanService {
 
   deleteTodo(id:string){
     return this.http.delete(`${this.apiUrl}/${id}`)
+  }
+
+  updateTodo(todo : Todo){
+    
+    let payload:any = {...todo}
+    payload._id = undefined
+    return this.http.put(`${this.apiUrl}/${todo._id}`, payload);
   }
   
 }
