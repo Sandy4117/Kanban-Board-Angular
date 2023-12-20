@@ -19,7 +19,7 @@ export class KanbanService {
     return this.http.post(`${this.apiUrl}`, data);
   }
 
-  deleteTodo(id:string){
+  deleteTodo(id:string){ 
     return this.http.delete(`${this.apiUrl}/${id}`)
   }
 
